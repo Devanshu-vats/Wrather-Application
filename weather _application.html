@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <!-- Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Custom Styles -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Simple spinning animation for the loader */
+        .loader {
+            border-top-color: #3498db;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Custom transition for smooth appearance */
+        .weather-card {
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-900 text-white flex items-center justify-center min-h-screen p-4">
+
+    <div class="w-full max-w-sm mx-auto">
+        <!-- Main Application Card -->
+        <div class="bg-gray-800 bg-opacity-50 backdrop-blur-md rounded-2xl shadow-2xl p-6">
+
+            <!-- Search Bar -->
+            <div class="flex mb-6">
+                <input type="text" id="city-input" placeholder="Enter city name..."
+                    class="flex-grow bg-gray-700 text-white placeholder-gray-400 rounded-l-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                <button id="search-btn"
+                    class="bg-blue-600 hover:bg-blue-700 rounded-r-lg px-4 py-2 transition duration-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Loader -->
+            <div id="loader" class="text-center py-10 hidden">
+                <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12 mx-auto">
+                </div>
+                <p class="mt-4 text-gray-400">Fetching weather...</p>
+            </div>
+
+            <!-- Error Message -->
+            <div id="error-message" class="text-center py-10 bg-red-500 bg-opacity-20 rounded-lg hidden">
+                <p class="text-red-400">City not found. Please try again.</p>
+            </div>
+
+            <!-- Weather Information Display -->
+            <div id="weather-info" class="text-center opacity-0 -translate-y-4 weather-card">
+                <!-- Location and Time -->
+                <p id="location-name" class="text-3xl font-bold"></p>
+                <p id="local-time" class="text-gray-400 text-sm mb-6"></p>
+
+                <!-- Main Weather Icon and Temperature -->
+                <div class="flex items-center justify-center my-6">
+                    <img id="weather-icon" src="https://placehold.co/64x64/000000/FFFFFF?text=?" alt="Weather Icon"
+                        class="w-24 h-24 -ml-4">
+                    <div>
+                        <p id="temperature" class="text-7xl font-bold"></p>
+                        <p id="condition-text" class="text-blue-300 capitalize text-lg"></p>
+                    </div>
+                </div>
+
+                <!-- Detailed Weather Info Grid -->
+                <div class="bg-gray-700 bg-opacity-50 rounded-lg p-4 grid grid-cols-2 gap-4 text-left">
+                    <div class="flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-blue-400" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <div>
+                            <p class="text-gray-400 text-sm">Feels Like</p>
+                            <p id="feels-like" class="font-semibold"></p>
+                        </div>
+                    </div>
+                    <div class="flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-blue-400" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                        </svg>
+                        <div>
+                            <p class="text-gray-400 text-sm">UV Index</p>
+                            <p id="uv-index" class="font-semibold"></p>
+                        </div>
+                    </div>
+                    <div class="flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-blue-400" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M12 11v6m0 0l-3-3m3 3l3-3" />
+                        </svg>
+                        <div>
+                            <p class="text-gray-400 text-sm">Humidity</p>
+                            <p id="humidity" class="font-semibold"></p>
+                        </div>
+                    </div>
+                    <div class="flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-blue-400" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                        <div>
+                            <p class="text-gray-400 text-sm">Wind Speed</p>
+                            <p id="wind-speed" class="font-semibold"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+         <!-- <footer class="text-center mt-4 text-xs text-gray-500"> -->
+            <!-- Powered by <a href="https://www.weatherapi.com/" title="Free Weather API" -->
+                <!-- class="underline hover:text-gray-300">WeatherAPI.com</a> -->
+        <!-- </footer>  -->
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // DOM Elements
+            const cityInput = document.getElementById('city-input');
+            const searchBtn = document.getElementById('search-btn');
+            const loader = document.getElementById('loader');
+            const errorMessage = document.getElementById('error-message');
+            const weatherInfo = document.getElementById('weather-info');
+
+            // API Configuration
+            const apiKey = 'badfb218453a4c98b0834248252109';
+            const apiUrl = 'https://api.weatherapi.com/v1/current.json';
+
+            // Function to fetch weather data
+            const fetchWeather = async (city) => {
+                // Show loader and hide other elements
+                loader.classList.remove('hidden');
+                errorMessage.classList.add('hidden');
+                weatherInfo.classList.add('opacity-0', '-translate-y-4');
+                weatherInfo.classList.add('hidden');
+
+                try {
+                    const response = await fetch(`${apiUrl}?key=${apiKey}&q=${city}&aqi=no`);
+
+                    if (!response.ok) {
+                        throw new Error('City not found');
+                    }
+
+                    const data = await response.json();
+                    updateUI(data);
+
+                } catch (error) {
+                    console.error("Error fetching weather:", error);
+                    showError();
+                } finally {
+                    // Hide loader after operation
+                    loader.classList.add('hidden');
+                }
+            };
+
+            // Function to display an error
+            const showError = () => {
+                errorMessage.classList.remove('hidden');
+                weatherInfo.classList.add('hidden');
+            };
+
+            // Function to update the UI with weather data
+            const updateUI = (data) => {
+                // Destructure data for easier access
+                const { location, current } = data;
+
+                // Update DOM elements with new data
+                document.getElementById('location-name').textContent = `${location.name}, ${location.country}`;
+                document.getElementById('local-time').textContent = formatDateTime(location.localtime);
+                document.getElementById('temperature').textContent = `${Math.round(current.temp_c)}°C`;
+                document.getElementById('condition-text').textContent = current.condition.text;
+                // Ensure icon URL is HTTPS
+                document.getElementById('weather-icon').src = `https:${current.condition.icon}`;
+                document.getElementById('weather-icon').alt = current.condition.text;
+
+                document.getElementById('feels-like').textContent = `${Math.round(current.feelslike_c)}°C`;
+                document.getElementById('uv-index').textContent = getUVDescription(current.uv);
+                document.getElementById('humidity').textContent = `${current.humidity}%`;
+                document.getElementById('wind-speed').textContent = `${current.wind_kph} kph`;
+
+                // Show weather info with a smooth transition
+                weatherInfo.classList.remove('hidden');
+                setTimeout(() => {
+                    weatherInfo.classList.remove('opacity-0', '-translate-y-4');
+                }, 10); // small delay to allow CSS transition to apply
+            };
+
+            // Helper function to format date and time
+            const formatDateTime = (datetimeString) => {
+                const date = new Date(datetimeString);
+                return date.toLocaleDateString('en-US', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            };
+
+            // Helper function for UV Index description
+            const getUVDescription = (uv) => {
+                if (uv <= 2) return `${uv} (Low)`;
+                if (uv <= 5) return `${uv} (Moderate)`;
+                if (uv <= 7) return `${uv} (High)`;
+                if (uv <= 10) return `${uv} (Very High)`;
+                return `${uv} (Extreme)`;
+            }
+
+            // Event Listeners
+            searchBtn.addEventListener('click', () => {
+                const city = cityInput.value.trim();
+                if (city) {
+                    fetchWeather(city);
+                }
+            });
+
+            cityInput.addEventListener('keyup', (event) => {
+                if (event.key === 'Enter') {
+                    const city = cityInput.value.trim();
+                    if (city) {
+                        fetchWeather(city);
+                    }
+                }
+            });
+
+            // Initial fetch for a default city
+            fetchWeather('London');
+        });
+    </script>
+
+</body>
+
+</html>
