@@ -51,12 +51,6 @@ Visit WeatherAPI.com and sign up for a free account to get your API key.
 
 Open the weather_app.html file in a text editor.
 
-Navigate to the <script> section at the bottom of the file.
-
-Find the following line and replace 'YOUR_API_KEY_HERE' with the key you obtained:
-
-const apiKey = 'badfb218453a4c98b0834248252109'; // Replace with your actual API key
-
 
 🙏 Acknowledgements
 Data provided by WeatherAPI.com
